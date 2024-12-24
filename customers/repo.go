@@ -31,5 +31,24 @@ func (r CustomerRepository) CreateCustomer(ctx context.Context, customer Custome
 	RETURNING id
 	`
 	err := r.conn.QueryRow(ctx, query, customer.Name, customer.Email).Scan(&customer.Id)
+	if err != nil {
+		return Customer{}, err
+	}
 	return customer, err
+}
+
+func (r CustomerRepository) GetCustomer(ctx context.Context, id string) (Customer, error) {
+	query := `
+	SELECT id, name ,email
+	FROM customer
+	WHERE email = $1
+	`
+
+	var customer Customer
+
+	err := r.conn.QueryRow(ctx, query, customer).Scan(&customer)
+	if err != nil {
+		return Customer{}, err
+	}
+	return customer, nil
 }
